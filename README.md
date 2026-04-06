@@ -1,5 +1,50 @@
 # Backend - Analisis Arquitectonico
 
+## Como arrancar el proyecto (paso a paso)
+
+1. **Instalar prerequisitos**
+   - Node.js 20+
+   - pnpm
+   - PostgreSQL corriendo
+
+2. **Configurar variables de entorno**
+   - Copiar `.env.example` a `.env`
+   - Ajustar `DATABASE_URL` y `PORT` segun tu entorno
+
+3. **Instalar dependencias**
+
+   ```bash
+   pnpm install
+   ```
+
+4. **Aplicar migraciones de base de datos**
+
+   ```bash
+   pnpm run prisma:migrate:dev
+   ```
+
+5. **Generar cliente Prisma**
+
+   ```bash
+   pnpm run prisma:generate
+   ```
+
+6. **Levantar el backend en desarrollo**
+
+   ```bash
+   pnpm run start:dev
+   ```
+
+7. **Verificar que funciona**
+   - Health: `GET http://127.0.0.1:3000/health/db`
+   - API base: `GET http://127.0.0.1:3000/`
+
+8. **(Opcional) Ejecutar pruebas**
+
+   ```bash
+   pnpm test --runInBand
+   ```
+
 ## 1) Tipo de arquitectura del proyecto base
 
 El proyecto esta construido con **NestJS** y sigue una arquitectura **modular monolitica** con estilo **en capas**:
@@ -49,7 +94,4 @@ En resumen: no es microservicios, sino un solo backend organizado por dominios f
 3. **Versionado de API**
    - Introducir `v1` en rutas para permitir evolucion sin romper clientes frontend.
 
-
-
 ---
-
