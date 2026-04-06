@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model GrupoTareas {
+  idGrupoTareas Int     @id @default(autoincrement()) @map("id_grupo_tareas")
+  nombreGrupo   String  @map("nombre_grupo") @db.VarChar(50)
+  tareas        Tarea[]
+
+  @@map("grupo_tareas")
+}
+
+model Tarea {
+  idTarea       Int         @id @default(autoincrement()) @map("id_tarea")
+  nombreTarea   String      @map("nombre_tarea") @db.VarChar(50)
+  idGrupoTareas Int         @map("id_grupo_tareas")
+  grupoTareas   GrupoTareas @relation(fields: [idGrupoTareas], references: [idGrupoTareas], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("tareas")
+}
