@@ -10,6 +10,7 @@ datasource db {
 model GrupoTareas {
   idGrupoTareas Int     @id @default(autoincrement()) @map("id_grupo_tareas")
   nombreGrupo   String  @map("nombre_grupo") @db.VarChar(50)
+  orden         Int     @default(0) @map("orden")
   tareas        Tarea[]
 
   @@map("grupo_tareas")
@@ -18,6 +19,8 @@ model GrupoTareas {
 model Tarea {
   idTarea       Int         @id @default(autoincrement()) @map("id_tarea")
   nombreTarea   String      @map("nombre_tarea") @db.VarChar(50)
+  completada    Boolean     @default(false) @map("completada")
+  orden         Int         @default(0) @map("orden")
   idGrupoTareas Int         @map("id_grupo_tareas")
   grupoTareas   GrupoTareas @relation(fields: [idGrupoTareas], references: [idGrupoTareas], onDelete: Cascade, onUpdate: NoAction)
 

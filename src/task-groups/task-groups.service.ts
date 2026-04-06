@@ -11,14 +11,19 @@ export class TaskGroupsService {
     return this.prisma.grupoTareas.create({
       data: {
         nombreGrupo: createTaskGroupDto.nombreGrupo,
+        orden: createTaskGroupDto.orden,
       },
     });
   }
 
   async findAll() {
     return this.prisma.grupoTareas.findMany({
-      orderBy: { idGrupoTareas: 'asc' },
-      include: { tareas: true },
+      orderBy: [{ orden: 'asc' }, { idGrupoTareas: 'asc' }],
+      include: {
+        tareas: {
+          orderBy: [{ orden: 'asc' }, { idTarea: 'asc' }],
+        },
+      },
     });
   }
 
@@ -35,6 +40,15 @@ export class TaskGroupsService {
     return taskGroup;
   }
 
+  async findTasksByGroup(id: number) {
+    await this.findOne(id);
+
+    return this.prisma.tarea.findMany({
+      where: { idGrupoTareas: id },
+      orderBy: [{ orden: 'asc' }, { idTarea: 'asc' }],
+    });
+  }
+
   async update(id: number, updateTaskGroupDto: UpdateTaskGroupDto) {
     await this.findOne(id);
 
@@ -42,6 +56,7 @@ export class TaskGroupsService {
       where: { idGrupoTareas: id },
       data: {
         nombreGrupo: updateTaskGroupDto.nombreGrupo,
+        orden: updateTaskGroupDto.orden,
       },
     });
   }

@@ -26,6 +26,8 @@ export class TasksService {
       data: {
         nombreTarea: createTaskDto.nombreTarea,
         idGrupoTareas: createTaskDto.idGrupoTareas,
+        completada: createTaskDto.completada,
+        orden: createTaskDto.orden,
       },
       include: { grupoTareas: true },
     });
@@ -33,7 +35,7 @@ export class TasksService {
 
   async findAll() {
     return this.prisma.tarea.findMany({
-      orderBy: { idTarea: 'asc' },
+      orderBy: [{ orden: 'asc' }, { idTarea: 'asc' }],
       include: { grupoTareas: true },
     });
   }
@@ -63,6 +65,8 @@ export class TasksService {
       data: {
         nombreTarea: updateTaskDto.nombreTarea,
         idGrupoTareas: updateTaskDto.idGrupoTareas,
+        completada: updateTaskDto.completada,
+        orden: updateTaskDto.orden,
       },
       include: { grupoTareas: true },
     });

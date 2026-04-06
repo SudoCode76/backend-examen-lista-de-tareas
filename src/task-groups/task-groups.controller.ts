@@ -26,6 +26,11 @@ export class TaskGroupsController {
     return this.taskGroupsService.findAll();
   }
 
+  @Get(':id/tasks')
+  async findTasksByGroup(@Param('id', ParseIntPipe) id: number) {
+    return this.taskGroupsService.findTasksByGroup(id);
+  }
+
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.taskGroupsService.findOne(id);

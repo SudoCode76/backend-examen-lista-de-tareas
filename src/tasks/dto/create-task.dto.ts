@@ -1,4 +1,12 @@
-import { IsInt, IsNotEmpty, IsString, MaxLength, Min } from 'class-validator';
+import {
+  IsBoolean,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 export class CreateTaskDto {
   @IsString()
@@ -9,4 +17,13 @@ export class CreateTaskDto {
   @IsInt()
   @Min(1)
   idGrupoTareas: number;
+
+  @IsOptional()
+  @IsBoolean()
+  completada?: boolean;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  orden?: number;
 }

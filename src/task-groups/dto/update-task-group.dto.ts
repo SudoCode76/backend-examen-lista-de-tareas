@@ -1,4 +1,11 @@
-import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 export class UpdateTaskGroupDto {
   @IsOptional()
@@ -6,4 +13,9 @@ export class UpdateTaskGroupDto {
   @IsNotEmpty()
   @MaxLength(50)
   nombreGrupo?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  orden?: number;
 }

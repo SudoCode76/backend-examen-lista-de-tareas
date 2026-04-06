@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -18,4 +19,13 @@ export class UpdateTaskDto {
   @IsInt()
   @Min(1)
   idGrupoTareas?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  completada?: boolean;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  orden?: number;
 }
