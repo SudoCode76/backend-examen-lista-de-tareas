@@ -7,12 +7,34 @@ import { UpdateTaskGroupDto } from './dto/update-task-group.dto';
 export class TaskGroupsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private buildCreateTaskGroupData(dto: CreateTaskGroupDto) {
+    return {
+      nombreGrupo: dto.nombreGrupo,
+      orden: dto.orden,
+    };
+  }
+
+  private buildUpdateTaskGroupData(dto: UpdateTaskGroupDto) {
+    return {
+      nombreGrupo: dto.nombreGrupo,
+      orden: dto.orden,
+    };
+  }
+
+  private async ensureTaskGroupExists(id: number) {
+    const taskGroup = await this.prisma.grupoTareas.findUnique({
+      where: { idGrupoTareas: id },
+      select: { idGrupoTareas: true },
+    });
+
+    if (!taskGroup) {
+      throw new NotFoundException(`Grupo de tareas con id ${id} no existe`);
+    }
+  }
+
   async create(createTaskGroupDto: CreateTaskGroupDto) {
     return this.prisma.grupoTareas.create({
-      data: {
-        nombreGrupo: createTaskGroupDto.nombreGrupo,
-        orden: createTaskGroupDto.orden,
-      },
+      data: this.buildCreateTaskGroupData(createTaskGroupDto),
     });
   }
 
@@ -30,7 +52,11 @@ export class TaskGroupsService {
   async findOne(id: number) {
     const taskGroup = await this.prisma.grupoTareas.findUnique({
       where: { idGrupoTareas: id },
-      include: { tareas: true },
+      include: {
+        tareas: {
+          orderBy: [{ orden: 'asc' }, { idTarea: 'asc' }],
+        },
+      },
     });
 
     if (!taskGroup) {
@@ -41,7 +67,7 @@ export class TaskGroupsService {
   }
 
   async findTasksByGroup(id: number) {
-    await this.findOne(id);
+    await this.ensureTaskGroupExists(id);
 
     return this.prisma.tarea.findMany({
       where: { idGrupoTareas: id },
@@ -50,19 +76,16 @@ export class TaskGroupsService {
   }
 
   async update(id: number, updateTaskGroupDto: UpdateTaskGroupDto) {
-    await this.findOne(id);
+    await this.ensureTaskGroupExists(id);
 
     return this.prisma.grupoTareas.update({
       where: { idGrupoTareas: id },
-      data: {
-        nombreGrupo: updateTaskGroupDto.nombreGrupo,
-        orden: updateTaskGroupDto.orden,
-      },
+      data: this.buildUpdateTaskGroupData(updateTaskGroupDto),
     });
   }
 
   async remove(id: number) {
-    await this.findOne(id);
+    await this.ensureTaskGroupExists(id);
 
     return this.prisma.grupoTareas.delete({
       where: { idGrupoTareas: id },

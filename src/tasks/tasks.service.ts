@@ -7,6 +7,8 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 export class TasksService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private readonly includeTaskGroup = { grupoTareas: true } as const;
+
   private async ensureGroupExists(idGrupoTareas: number) {
     const group = await this.prisma.grupoTareas.findUnique({
       where: { idGrupoTareas },
@@ -19,24 +21,48 @@ export class TasksService {
     }
   }
 
+  private async ensureTaskExists(id: number) {
+    const task = await this.prisma.tarea.findUnique({
+      where: { idTarea: id },
+      select: { idTarea: true },
+    });
+
+    if (!task) {
+      throw new NotFoundException(`Tarea con id ${id} no existe`);
+    }
+  }
+
+  private buildCreateTaskData(dto: CreateTaskDto) {
+    return {
+      nombreTarea: dto.nombreTarea,
+      idGrupoTareas: dto.idGrupoTareas,
+      completada: dto.completada,
+      orden: dto.orden,
+    };
+  }
+
+  private buildUpdateTaskData(dto: UpdateTaskDto) {
+    return {
+      nombreTarea: dto.nombreTarea,
+      idGrupoTareas: dto.idGrupoTareas,
+      completada: dto.completada,
+      orden: dto.orden,
+    };
+  }
+
   async create(createTaskDto: CreateTaskDto) {
     await this.ensureGroupExists(createTaskDto.idGrupoTareas);
 
     return this.prisma.tarea.create({
-      data: {
-        nombreTarea: createTaskDto.nombreTarea,
-        idGrupoTareas: createTaskDto.idGrupoTareas,
-        completada: createTaskDto.completada,
-        orden: createTaskDto.orden,
-      },
-      include: { grupoTareas: true },
+      data: this.buildCreateTaskData(createTaskDto),
+      include: this.includeTaskGroup,
     });
   }
 
   async findAll() {
     return this.prisma.tarea.findMany({
       orderBy: [{ orden: 'asc' }, { idTarea: 'asc' }],
-      include: { grupoTareas: true },
+      include: this.includeTaskGroup,
     });
   }
 
@@ -54,7 +80,7 @@ export class TasksService {
   }
 
   async update(id: number, updateTaskDto: UpdateTaskDto) {
-    await this.findOne(id);
+    await this.ensureTaskExists(id);
 
     if (updateTaskDto.idGrupoTareas !== undefined) {
       await this.ensureGroupExists(updateTaskDto.idGrupoTareas);
@@ -62,18 +88,13 @@ export class TasksService {
 
     return this.prisma.tarea.update({
       where: { idTarea: id },
-      data: {
-        nombreTarea: updateTaskDto.nombreTarea,
-        idGrupoTareas: updateTaskDto.idGrupoTareas,
-        completada: updateTaskDto.completada,
-        orden: updateTaskDto.orden,
-      },
-      include: { grupoTareas: true },
+      data: this.buildUpdateTaskData(updateTaskDto),
+      include: this.includeTaskGroup,
     });
   }
 
   async remove(id: number) {
-    await this.findOne(id);
+    await this.ensureTaskExists(id);
 
     return this.prisma.tarea.delete({
       where: { idTarea: id },

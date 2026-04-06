@@ -42,7 +42,7 @@ describe('TaskGroupsService', () => {
 
       expect(prismaMock.grupoTareas.findUnique).toHaveBeenCalledWith({
         where: { idGrupoTareas: groupId },
-        include: { tareas: true },
+        select: { idGrupoTareas: true },
       });
       expect(prismaMock.tarea.findMany).toHaveBeenCalledWith({
         where: { idGrupoTareas: groupId },
